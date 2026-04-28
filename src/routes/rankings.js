@@ -76,9 +76,9 @@ router.get('/batch', async (req, res) => {
       }))
     }));
 
-    res.json({ 
+    res.json({
       overall: overallRanked,
-      dateWise: rankedByDate 
+      dateWise: rankedByDate
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -207,7 +207,7 @@ router.get('/event-winners', async (req, res) => {
   try {
     const eventWinners = await Score.aggregate([
       {
-        $sort: { eventName: 1, point: -1 }
+        $sort: { eventName: 1, category: 1, point: -1 }   // Sort by event, category, then highest points
       },
       {
         $group: {
@@ -215,9 +215,10 @@ router.get('/event-winners', async (req, res) => {
             eventName: '$eventName',
             category: '$category'
           },
-          winners: {
+          students: {
             $push: {
               studentName: '$studentName',
+              gender: '$gender',
               point: '$point',
               prize: '$prize',
               batch: '$batch'
@@ -229,7 +230,20 @@ router.get('/event-winners', async (req, res) => {
         $project: {
           eventName: '$_id.eventName',
           category: '$_id.category',
-          topThree: { $slice: ['$winners', 3] },
+          students: {
+            $map: {
+              input: { $range: [0, { $size: '$students' }] },   // index from 0
+              as: "index",
+              in: {
+                rank: { $add: ["$$index", 1] },                 // rank starts from 1
+                studentName: { $arrayElemAt: ['$students.studentName', "$$index"] },
+                gender: { $arrayElemAt: ['$students.gender', "$$index"] },
+                point: { $arrayElemAt: ['$students.point', "$$index"] },
+                prize: { $arrayElemAt: ['$students.prize', "$$index"] },
+                batch: { $arrayElemAt: ['$students.batch', "$$index"] }
+              }
+            }
+          },
           _id: 0
         }
       },
@@ -237,8 +251,10 @@ router.get('/event-winners', async (req, res) => {
         $sort: { eventName: 1, category: 1 }
       }
     ]);
+
     res.json(eventWinners);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
