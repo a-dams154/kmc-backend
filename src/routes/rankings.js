@@ -218,7 +218,6 @@ router.get('/event-winners', async (req, res) => {
           students: {
             $push: {
               studentName: '$studentName',
-              gender: '$gender',
               point: '$point',
               prize: '$prize',
               batch: '$batch'
@@ -237,7 +236,6 @@ router.get('/event-winners', async (req, res) => {
               in: {
                 rank: { $add: ["$$index", 1] },                 // rank starts from 1
                 studentName: { $arrayElemAt: ['$students.studentName', "$$index"] },
-                gender: { $arrayElemAt: ['$students.gender', "$$index"] },
                 point: { $arrayElemAt: ['$students.point', "$$index"] },
                 prize: { $arrayElemAt: ['$students.prize', "$$index"] },
                 batch: { $arrayElemAt: ['$students.batch', "$$index"] }

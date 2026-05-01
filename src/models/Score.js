@@ -11,11 +11,6 @@ const ScoreSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  gender: {
-    type: String,
-    enum: ['Male', 'Female', 'Other'],
-    required: true,
-  },
   eventType: {
     type: String,
     enum: ['group', 'individual'],

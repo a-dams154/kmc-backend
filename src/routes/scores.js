@@ -5,9 +5,9 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/', auth, async (req, res) => {
-  const { studentName, eventName, gender, eventType, category, point, prize, batch, eventDate } = req.body;
+  const { studentName, eventName, eventType, category, point, prize, batch, eventDate } = req.body;
   console.log('Received score data:', req.body);
-  if (!studentName || !eventName || !gender || !eventType || !category || point == null || !prize || !batch || !eventDate) {
+  if (!studentName || !eventName || !eventType || !category || point == null || !prize || !batch || !eventDate) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -19,7 +19,6 @@ router.post('/', auth, async (req, res) => {
     const newScore = await Score.create({
       studentName,
       eventName,
-      gender,
       eventType,
       category,
       point,
@@ -74,7 +73,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.put('/:id', auth, async (req, res) => {
-  const { studentName, eventName, gender, eventType, category, point, prize, batch, eventDate } = req.body;
+  const { studentName, eventName, eventType, category, point, prize, batch, eventDate } = req.body;
 
   if (eventType && !['group', 'individual'].includes(eventType)) {
     return res.status(400).json({ message: 'eventType must be either group or individual' });
@@ -88,7 +87,6 @@ router.put('/:id', auth, async (req, res) => {
 
     if (studentName) scoreRecord.studentName = studentName;
     if (eventName) scoreRecord.eventName = eventName;
-    if (gender) scoreRecord.gender = gender;
     if (eventType) scoreRecord.eventType = eventType;
     if (category) scoreRecord.category = category;
     if (point != null) scoreRecord.point = point;
